@@ -6,7 +6,7 @@ import {
   OnDestroy,
   OnInit,
 } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { Subscription, interval } from 'rxjs';
 import { IPost } from 'src/app/models/IPost';
 import { PostService } from 'src/app/services/post.service';
 
@@ -14,25 +14,51 @@ import { PostService } from 'src/app/services/post.service';
   selector: 'app-posts',
   templateUrl: './posts.component.html',
   styleUrls: ['./posts.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  // changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PostsComponent implements OnInit, OnDestroy {
   posts!: IPost[];
   // { categoryId: '123', id: '12', description: 'abc', title: 'haha' },
   postSubscription!: Subscription;
+  intervalSubscription!: Subscription;
   constructor(
     private postService: PostService,
     private ref: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
-    this.postService.getPostsWithCategory().subscribe((data) => {
-      this.posts = data;
-      this.ref.detectChanges();
+    this.getPosts();
+  }
+
+  getPosts() {
+    // this.intervalSubscription = interval(1000).subscribe({
+    //   next: (data) => {
+    //     console.log(data);
+    //   },
+    //   error: (err) => {
+    //     console.log(`This is ${err}`);
+    //   },
+    //   complete: () => {
+    //     console.log('interval completed');
+    //   },
+    // });
+    this.postSubscription = this.postService.getPostsWithCategory().subscribe({
+      next: (data) => {
+        this.posts = data;
+        // this.ref.detectChanges();
+      },
+
+      error: (err) => {
+        console.log(`This is ${err}`);
+      },
+      complete: () => {
+        console.log('http call completed');
+      },
     });
   }
 
   ngOnDestroy(): void {
     this.postSubscription && this.postSubscription.unsubscribe();
+    this.intervalSubscription && this.intervalSubscription.unsubscribe();
   }
 }
