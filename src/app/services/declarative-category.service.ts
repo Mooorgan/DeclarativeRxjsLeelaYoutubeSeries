@@ -14,9 +14,11 @@ export class DeclarativeCategoryService {
     .pipe(
       map((categories) => {
         const categoriesData: ICategory[] = [];
-        for (let id in categories) {
+        for (const id in categories) {
+          // console.log(id, categories[id]);
           categoriesData.push({ ...categories[id], id });
         }
+        // console.log(categoriesData);
         return categoriesData;
       })
     );

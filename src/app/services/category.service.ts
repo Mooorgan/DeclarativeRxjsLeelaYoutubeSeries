@@ -20,6 +20,7 @@ export class CategoryService {
           for (let id in categories) {
             categoriesData.push({ ...categories[id], id });
           }
+          // console.log(categoriesData);
           return categoriesData;
         })
       );
