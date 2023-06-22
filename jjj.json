@@ -1,0 +1,79 @@
+{
+  "posts": [
+    {
+      "categoryId": "1",
+      "description": "hello",
+      "id": "-NKwodkXoFAfs47nVY6A",
+      "title": "Books"
+    },
+    {
+      "categoryId": "2",
+      "description": "haha",
+      "id": "-NKwodkXoFAfs47nVY6b",
+      "title": "Mango"
+    },
+    {
+      "categoryId": "3",
+      "description": "Plate",
+      "id": "-NKwodkXoFAfs47nVY6c",
+      "title": "Orange"
+    },
+    {
+      "categoryId": "4",
+      "description": "Bajang",
+      "id": "-NKwodkXoFAfs47nVY6d",
+      "title": "Banana"
+    },
+    {
+      "categoryId": "5",
+      "description": "Samsung",
+      "id": "-NKwodkXoFAfs47nVY6e",
+      "title": "Cherry"
+    },
+    {
+      "categoryId": "6",
+      "description": "Jeep",
+      "id": "-NKwodkXoFAfs47nVY6f",
+      "title": "Luti"
+    },
+    {
+      "categoryId": "7",
+      "description": "SUV",
+      "id": "-NKwodkXoFAfs47nVY6g",
+      "title": "Hookshie"
+    },
+    {
+      "categoryId": "8",
+      "description": "kahana",
+      "id": "-NKwodkXoFAfs47nVY6h",
+      "title": "Antman"
+    }
+  ],
+
+  "categories": {
+    "1": {
+      "title": "One"
+    },
+    "2": {
+      "title": "Two"
+    },
+    "3": {
+      "title": "Three"
+    },
+    "4": {
+      "title": "Four"
+    },
+    "5": {
+      "title": "Five"
+    },
+    "6": {
+      "title": "Six"
+    },
+    "7": {
+      "title": "Seven"
+    },
+    "8": {
+      "title": "Eight"
+    }
+  }
+}
