@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { IPost } from '../models/IPost';
+import { CRUDAction, IPost } from '../models/IPost';
 import {
   BehaviorSubject,
   Subject,
@@ -8,6 +8,8 @@ import {
   combineLatest,
   delay,
   map,
+  merge,
+  scan,
   share,
   shareReplay,
   throwError,
@@ -49,6 +51,26 @@ export class DeclarativePostService {
     catchError(this.handleError),
     shareReplay(1)
   );
+
+  private postCRUDSubject = new Subject<CRUDAction<IPost>>();
+  postCRUDAction$ = this.postCRUDSubject.asObservable();
+
+  allPost$ = merge(
+    this.postWithCategory$,
+    this.postCRUDAction$.pipe(map((data) => [data.data]))
+  ).pipe(
+    scan((posts, value) => {
+      return [...posts, ...value];
+    }, [] as IPost[])
+    // map(([value1, value2]) => {
+    //   console.log('HEYYY', value1, value2);
+    //   return [...value1, ...value2];
+    // })
+  );
+
+  addPost(post: IPost) {
+    this.postCRUDSubject.next({ action: 'add', data: post });
+  }
 
   private selectedPostSubject = new Subject<string>();
   selectedPostAction$ = this.selectedPostSubject.asObservable();

@@ -10,8 +10,9 @@ import { DeclarativePostService } from 'src/app/services/declarative-post.servic
 })
 export class AltPostsComponent {
   showAddPost = false;
-  posts$ = this.postService.postWithCategory$.pipe(
+  posts$ = this.postService.allPost$.pipe(
     tap((posts) => {
+      console.log('from inside allpost');
       posts[0].id && this.postService.selectPost(posts[0].id);
     })
   );
@@ -19,6 +20,7 @@ export class AltPostsComponent {
 
   vm$ = combineLatest([this.posts$, this.selectedPost$]).pipe(
     map(([posts, selectedPost]) => {
+      console.log('from alt post combine latest');
       return { posts, selectedPost };
     })
   );
