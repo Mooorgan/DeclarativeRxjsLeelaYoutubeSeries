@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { IPost } from '../models/IPost';
 import {
+  BehaviorSubject,
   Subject,
   catchError,
   combineLatest,
@@ -24,7 +25,7 @@ export class DeclarativePostService {
       `https://angular-rxjsreactive-default-rtdb.asia-southeast1.firebasedatabase.app/posts.json`
     )
     .pipe(
-      delay(2000),
+      // delay(2000),
       catchError(this.handleError),
       // shareReplay(1)
       share()
