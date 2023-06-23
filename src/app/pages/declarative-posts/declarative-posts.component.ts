@@ -54,6 +54,9 @@ export class DeclarativePostsComponent implements OnInit {
   // );
 
   ngOnInit(): void {
+    // setTimeout(() => {
+    //   this.loaderService.showLoader();
+    // }, 0);
     this.loaderService.showLoader();
   }
 

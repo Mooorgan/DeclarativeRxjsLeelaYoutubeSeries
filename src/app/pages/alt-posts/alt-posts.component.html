@@ -1,4 +1,13 @@
 <div class="row">
+  <div class="col-md-12">
+    <h3>PostDetails</h3>
+    <div class="my-2">
+      <button (click)="onAddPost()" class="btn btn-primary">Add Post</button>
+    </div>
+  </div>
+</div>
+
+<div class="row">
   <div class="col-md-4">
     <div class="list-group" *ngIf="vm$ | async as vm">
       <a
@@ -12,5 +21,8 @@
       </a>
     </div>
   </div>
-  <div class="col-md-8"><app-single-post></app-single-post></div>
+  <div class="col-md-8">
+    <app-single-post *ngIf="!showAddPost"></app-single-post>
+    <app-add-post *ngIf="showAddPost"></app-add-post>
+  </div>
 </div>

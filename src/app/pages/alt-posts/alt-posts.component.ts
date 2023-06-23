@@ -9,6 +9,7 @@ import { DeclarativePostService } from 'src/app/services/declarative-post.servic
   styleUrls: ['./alt-posts.component.scss'],
 })
 export class AltPostsComponent {
+  showAddPost = false;
   posts$ = this.postService.postWithCategory$.pipe(
     tap((posts) => {
       posts[0].id && this.postService.selectPost(posts[0].id);
@@ -27,5 +28,9 @@ export class AltPostsComponent {
     event.preventDefault();
     console.log(post);
     this.postService.selectPost(post.id);
+  }
+
+  onAddPost() {
+    this.showAddPost = true;
   }
 }

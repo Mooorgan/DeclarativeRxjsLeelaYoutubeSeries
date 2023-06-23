@@ -21,8 +21,8 @@ export class DeclarativeCategoryService {
         // console.log(categoriesData);
         return categoriesData;
       }),
-      // shareReplay(1)
-      share()
+      shareReplay(1)
+      // share()
     );
   constructor(private http: HttpClient) {}
 }

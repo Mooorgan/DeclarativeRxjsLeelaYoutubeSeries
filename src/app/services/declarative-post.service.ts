@@ -27,8 +27,8 @@ export class DeclarativePostService {
     .pipe(
       // delay(2000),
       catchError(this.handleError),
-      // shareReplay(1)
-      share()
+      shareReplay(1)
+      // share()
     );
 
   postWithCategory$ = combineLatest([
@@ -46,7 +46,8 @@ export class DeclarativePostService {
         } as IPost;
       });
     }),
-    catchError(this.handleError)
+    catchError(this.handleError),
+    shareReplay(1)
   );
 
   private selectedPostSubject = new Subject<string>();
@@ -64,7 +65,8 @@ export class DeclarativePostService {
     map(([posts, selectedPostId]) => {
       return posts.find((post) => post.id === selectedPostId);
     }),
-    catchError(this.handleError)
+    catchError(this.handleError),
+    shareReplay(1)
   );
 
   selectPost(postId: string) {
