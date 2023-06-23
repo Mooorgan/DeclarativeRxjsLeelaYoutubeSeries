@@ -1,7 +1,15 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { IPost } from '../models/IPost';
-import { Subject, catchError, combineLatest, map, throwError } from 'rxjs';
+import {
+  Subject,
+  catchError,
+  combineLatest,
+  map,
+  share,
+  shareReplay,
+  throwError,
+} from 'rxjs';
 import { CategoryService } from './category.service';
 import { DeclarativeCategoryService } from './declarative-category.service';
 
@@ -11,9 +19,13 @@ import { DeclarativeCategoryService } from './declarative-category.service';
 export class DeclarativePostService {
   posts$ = this.http
     .get<IPost[]>(
-      `https://angularrrr-rxjsreactive-default-rtdb.asia-southeast1.firebasedatabase.app/posts.json`
+      `https://angular-rxjsreactive-default-rtdb.asia-southeast1.firebasedatabase.app/posts.json`
     )
-    .pipe(catchError(this.handleError));
+    .pipe(
+      catchError(this.handleError),
+      // shareReplay(1)
+      share()
+    );
 
   postWithCategory$ = combineLatest([
     //can also be done with forkJoin
