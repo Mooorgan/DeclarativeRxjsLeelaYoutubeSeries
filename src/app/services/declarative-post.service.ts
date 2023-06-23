@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { IPost } from '../models/IPost';
-import { Subject, combineLatest, map } from 'rxjs';
+import { Subject, catchError, combineLatest, map, throwError } from 'rxjs';
 import { CategoryService } from './category.service';
 import { DeclarativeCategoryService } from './declarative-category.service';
 
@@ -9,9 +9,11 @@ import { DeclarativeCategoryService } from './declarative-category.service';
   providedIn: 'root',
 })
 export class DeclarativePostService {
-  posts$ = this.http.get<IPost[]>(
-    `https://angular-rxjsreactive-default-rtdb.asia-southeast1.firebasedatabase.app/posts.json`
-  );
+  posts$ = this.http
+    .get<IPost[]>(
+      `https://angularrrr-rxjsreactive-default-rtdb.asia-southeast1.firebasedatabase.app/posts.json`
+    )
+    .pipe(catchError(this.handleError));
 
   postWithCategory$ = combineLatest([
     //can also be done with forkJoin
@@ -27,7 +29,8 @@ export class DeclarativePostService {
           )?.title,
         } as IPost;
       });
-    })
+    }),
+    catchError(this.handleError)
   );
 
   private selectedPostSubject = new Subject<string>();
@@ -44,10 +47,17 @@ export class DeclarativePostService {
   ]).pipe(
     map(([posts, selectedPostId]) => {
       return posts.find((post) => post.id === selectedPostId);
-    })
+    }),
+    catchError(this.handleError)
   );
 
   selectPost(postId: string) {
     this.selectedPostSubject.next(postId);
+  }
+
+  handleError(error: Error) {
+    return throwError(() => {
+      return 'unknown error occurred. Please try again';
+    });
   }
 }
