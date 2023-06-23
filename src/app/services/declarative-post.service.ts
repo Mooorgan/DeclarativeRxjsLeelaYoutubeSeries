@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { IPost } from '../models/IPost';
-import { combineLatest, map } from 'rxjs';
+import { Subject, combineLatest, map } from 'rxjs';
 import { CategoryService } from './category.service';
 import { DeclarativeCategoryService } from './declarative-category.service';
 
@@ -29,8 +29,25 @@ export class DeclarativePostService {
       });
     })
   );
+
+  private selectedPostSubject = new Subject<string>();
+  selectedPostAction$ = this.selectedPostSubject.asObservable();
+
   constructor(
     private http: HttpClient,
     private categoryService: DeclarativeCategoryService
   ) {}
+
+  post$ = combineLatest([
+    this.postWithCategory$,
+    this.selectedPostAction$,
+  ]).pipe(
+    map(([posts, selectedPostId]) => {
+      return posts.find((post) => post.id === selectedPostId);
+    })
+  );
+
+  selectPost(postId: string) {
+    this.selectedPostSubject.next(postId);
+  }
 }
