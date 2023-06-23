@@ -1,4 +1,6 @@
 <app-header></app-header>
+
+<app-loading *ngIf="showLoader$ | async"></app-loading>
 <div class="container">
   <div class="row">
     <div class="colmd-12">

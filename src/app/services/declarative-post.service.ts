@@ -5,10 +5,12 @@ import {
   Subject,
   catchError,
   combineLatest,
+  delay,
   map,
   share,
   shareReplay,
   throwError,
+  timer,
 } from 'rxjs';
 import { CategoryService } from './category.service';
 import { DeclarativeCategoryService } from './declarative-category.service';
@@ -22,6 +24,7 @@ export class DeclarativePostService {
       `https://angular-rxjsreactive-default-rtdb.asia-southeast1.firebasedatabase.app/posts.json`
     )
     .pipe(
+      delay(2000),
       catchError(this.handleError),
       // shareReplay(1)
       share()
