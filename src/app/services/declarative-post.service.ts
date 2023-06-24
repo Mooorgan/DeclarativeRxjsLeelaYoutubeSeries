@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { CRUDAction, IPost } from '../models/IPost';
 import {
   BehaviorSubject,
+  Observable,
   Subject,
   catchError,
   combineLatest,
@@ -14,6 +15,7 @@ import {
   scan,
   share,
   shareReplay,
+  tap,
   throwError,
   timer,
 } from 'rxjs';
@@ -48,7 +50,7 @@ export class DeclarativePostService {
     this.categoryService.categories$,
   ]).pipe(
     map(([posts, categories]) => {
-      console.log(posts);
+      console.log(posts, 'hehe');
       return posts.map((post) => {
         return {
           ...post,
@@ -80,7 +82,8 @@ export class DeclarativePostService {
       )
     )
   ).pipe(
-    scan((posts, value) => {
+    // tap(console.log),
+    scan((posts, value: IPost[] | CRUDAction<IPost>) => {
       // return [...posts, ...value];
       return this.modifyPosts(posts, value);
     }, [] as IPost[]),
@@ -96,6 +99,11 @@ export class DeclarativePostService {
       if (value.action === 'add') {
         return [...posts, value.data];
       }
+      if (value.action === 'update') {
+        return posts.map((post) =>
+          post.id === value.data.id ? value.data : post
+        );
+      }
     } else {
       return value;
     }
@@ -103,24 +111,34 @@ export class DeclarativePostService {
   }
 
   savePosts(postAction: CRUDAction<IPost>) {
+    let postDetails$!: Observable<IPost>;
     if (postAction.action === 'add') {
-      return this.addPostToServer(postAction.data).pipe(
-        concatMap((post) =>
-          this.categoryService.categories$.pipe(
-            map((categories) => {
-              return {
-                ...post,
-                categoryName: categories.find(
-                  (category) => category.id === post.categoryId
-                )?.title,
-              };
-            })
-          )
-        )
-      );
-    } else {
-      return of(postAction.data);
+      postDetails$ = this.addPostToServer(postAction.data);
     }
+    if (postAction.action === 'update') {
+      postDetails$ = this.updatePostToServer(postAction.data);
+    }
+    return postDetails$.pipe(
+      concatMap((post) =>
+        this.categoryService.categories$.pipe(
+          map((categories) => {
+            return {
+              ...post,
+              categoryName: categories.find(
+                (category) => category.id === post.categoryId
+              )?.title,
+            };
+          })
+        )
+      )
+    );
+  }
+
+  updatePostToServer(post: IPost) {
+    return this.http.patch<IPost>(
+      `https://angular-rxjsreactive-default-rtdb.asia-southeast1.firebasedatabase.app/posts/${post.id}.json`,
+      post
+    );
   }
 
   addPostToServer(post: IPost) {
@@ -141,6 +159,9 @@ export class DeclarativePostService {
 
   addPost(post: IPost) {
     this.postCRUDSubject.next({ action: 'add', data: post });
+  }
+  updatePost(post: IPost) {
+    this.postCRUDSubject.next({ action: 'update', data: post });
   }
 
   private selectedPostSubject = new Subject<string>();

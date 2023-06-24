@@ -16,6 +16,7 @@ import { DeclarativePostService } from 'src/app/services/declarative-post.servic
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class UpdatePostComponent {
+  postId = '';
   postForm = new UntypedFormGroup({
     title: new UntypedFormControl(''),
     description: new UntypedFormControl(''),
@@ -26,6 +27,7 @@ export class UpdatePostComponent {
 
   post$ = this.postService.post$.pipe(
     tap((post) => {
+      post?.id && (this.postId = post.id);
       this.postForm.setValue({
         title: post?.title,
         description: post?.description,
@@ -37,4 +39,15 @@ export class UpdatePostComponent {
     private categoryService: DeclarativeCategoryService,
     private postService: DeclarativePostService
   ) {}
+
+  onUpdatePost() {
+    const postDetails = {
+      ...this.postForm.value,
+      id: this.postId,
+    };
+
+    // console.log(postDetails);
+
+    this.postService.updatePost(postDetails);
+  }
 }
