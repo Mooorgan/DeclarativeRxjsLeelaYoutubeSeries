@@ -6,9 +6,11 @@ import {
   Subject,
   catchError,
   combineLatest,
+  concatMap,
   delay,
   map,
   merge,
+  of,
   scan,
   share,
   shareReplay,
@@ -27,6 +29,13 @@ export class DeclarativePostService {
       `https://angular-rxjsreactive-default-rtdb.asia-southeast1.firebasedatabase.app/posts.json`
     )
     .pipe(
+      map((posts) => {
+        let postsData: IPost[] = [];
+        for (let id in posts) {
+          postsData.push({ ...posts[id], id });
+        }
+        return postsData;
+      }),
       // delay(2000),
       catchError(this.handleError),
       shareReplay(1)
@@ -39,6 +48,7 @@ export class DeclarativePostService {
     this.categoryService.categories$,
   ]).pipe(
     map(([posts, categories]) => {
+      console.log(posts);
       return posts.map((post) => {
         return {
           ...post,
@@ -57,16 +67,77 @@ export class DeclarativePostService {
 
   allPost$ = merge(
     this.postWithCategory$,
-    this.postCRUDAction$.pipe(map((data) => [data.data]))
+    this.postCRUDAction$.pipe(
+      concatMap((postAction) =>
+        this.savePosts(postAction).pipe(
+          map((post) => {
+            return {
+              ...postAction,
+              data: post,
+            };
+          })
+        )
+      )
+    )
   ).pipe(
     scan((posts, value) => {
-      return [...posts, ...value];
-    }, [] as IPost[])
+      // return [...posts, ...value];
+      return this.modifyPosts(posts, value);
+    }, [] as IPost[]),
+    shareReplay(1)
     // map(([value1, value2]) => {
     //   console.log('HEYYY', value1, value2);
     //   return [...value1, ...value2];
     // })
   );
+
+  modifyPosts(posts: IPost[], value: IPost[] | CRUDAction<IPost>) {
+    if (!(value instanceof Array)) {
+      if (value.action === 'add') {
+        return [...posts, value.data];
+      }
+    } else {
+      return value;
+    }
+    return posts;
+  }
+
+  savePosts(postAction: CRUDAction<IPost>) {
+    if (postAction.action === 'add') {
+      return this.addPostToServer(postAction.data).pipe(
+        concatMap((post) =>
+          this.categoryService.categories$.pipe(
+            map((categories) => {
+              return {
+                ...post,
+                categoryName: categories.find(
+                  (category) => category.id === post.categoryId
+                )?.title,
+              };
+            })
+          )
+        )
+      );
+    } else {
+      return of(postAction.data);
+    }
+  }
+
+  addPostToServer(post: IPost) {
+    return this.http
+      .post<{ name: string }>(
+        `https://angular-rxjsreactive-default-rtdb.asia-southeast1.firebasedatabase.app/posts.json`,
+        post
+      )
+      .pipe(
+        map((id) => {
+          return {
+            ...post,
+            id: id.name,
+          };
+        })
+      );
+  }
 
   addPost(post: IPost) {
     this.postCRUDSubject.next({ action: 'add', data: post });
@@ -80,10 +151,7 @@ export class DeclarativePostService {
     private categoryService: DeclarativeCategoryService
   ) {}
 
-  post$ = combineLatest([
-    this.postWithCategory$,
-    this.selectedPostAction$,
-  ]).pipe(
+  post$ = combineLatest([this.allPost$, this.selectedPostAction$]).pipe(
     map(([posts, selectedPostId]) => {
       return posts.find((post) => post.id === selectedPostId);
     }),
@@ -96,6 +164,7 @@ export class DeclarativePostService {
   }
 
   handleError(error: Error) {
+    console.log(error);
     return throwError(() => {
       return 'unknown error occurred. Please try again';
     });
