@@ -5,8 +5,21 @@
 </div>
 
 <div *ngIf="post$ | async as post">
+  <div class="col-md-12">
+    <button class="btn btn-warning" (click)="onUpdatePost()">
+      Update Post
+    </button>
+    <h3>Post Details</h3>
+  </div>
   <div>Id: {{ post.id }}</div>
   <div>Title: {{ post.title }}</div>
   <div>Description: {{ post.description }}</div>
   <div>Category: {{ post.categoryName }}</div>
+
+  <app-update-post *ngIf="showUpdatePost"></app-update-post>
+  <!-- {{ showUpdatePost }} -->
 </div>
+<!-- <hr />
+<div *ngFor="let arr of array">
+  <div>{{ arr }}</div>
+</div> -->
