@@ -32,6 +32,9 @@ export class DeclarativePostService {
       `https://angular-rxjsreactive-default-rtdb.asia-southeast1.firebasedatabase.app/posts.json`
     )
     .pipe(
+      tap((value) => {
+        console.log('FIRST posts$ from database ran', value);
+      }),
       map((posts) => {
         let postsData: IPost[] = [];
         for (let id in posts) {
@@ -50,6 +53,10 @@ export class DeclarativePostService {
     this.posts$,
     this.categoryService.categories$,
   ]).pipe(
+    tap((value) => {
+      console.log('postWithCategory$ ran', value);
+    }),
+
     map(([posts, categories]) => {
       console.log(posts, 'hehe');
       return posts.map((post) => {
@@ -66,11 +73,21 @@ export class DeclarativePostService {
   );
 
   private postCRUDSubject = new Subject<CRUDAction<IPost>>();
-  postCRUDAction$ = this.postCRUDSubject.asObservable();
+  postCRUDAction$ = this.postCRUDSubject.asObservable().pipe(
+    tap((value) => {
+      console.log('postCRUDAction$ ran', value);
+    })
+  );
+
+  private postCRUDCompleteSubject = new Subject<boolean>();
+  postCRUDCompleteAction$ = this.postCRUDSubject.asObservable();
 
   allPost$ = merge(
     this.postWithCategory$,
     this.postCRUDAction$.pipe(
+      tap((value) => {
+        console.log('POSTcrudaction$ ran', value);
+      }),
       concatMap((postAction) =>
         this.savePosts(postAction).pipe(
           map((post) => {
@@ -83,6 +100,9 @@ export class DeclarativePostService {
       )
     )
   ).pipe(
+    tap((value) => {
+      console.log('allposts$ ran');
+    }),
     // tap(console.log),
     scan((posts, value: IPost[] | CRUDAction<IPost>) => {
       // return [...posts, ...value];
@@ -120,6 +140,7 @@ export class DeclarativePostService {
       postDetails$ = this.addPostToServer(postAction.data).pipe(
         tap(() => {
           this.notificationService.setSuccessMessage('Post added Successfully');
+          this.postCRUDCompleteSubject.next(true);
         })
       );
     }
@@ -129,6 +150,7 @@ export class DeclarativePostService {
           this.notificationService.setSuccessMessage(
             'Post updated Successfully'
           );
+          this.postCRUDCompleteSubject.next(true);
         })
       );
     }
@@ -138,6 +160,7 @@ export class DeclarativePostService {
           this.notificationService.setSuccessMessage(
             'Post deleted Successfully'
           );
+          this.postCRUDCompleteSubject.next(true);
         }),
         map((_) => {
           return postAction.data;
@@ -201,7 +224,11 @@ export class DeclarativePostService {
   }
 
   private selectedPostSubject = new Subject<string>();
-  selectedPostAction$ = this.selectedPostSubject.asObservable();
+  selectedPostAction$ = this.selectedPostSubject.asObservable().pipe(
+    tap((value) => {
+      console.log('selectedPostAction$ ran', value);
+    })
+  );
 
   constructor(
     private http: HttpClient,
@@ -210,6 +237,9 @@ export class DeclarativePostService {
   ) {}
 
   post$ = combineLatest([this.allPost$, this.selectedPostAction$]).pipe(
+    tap((value) => {
+      console.log(value, 'post$ ran');
+    }),
     map(([posts, selectedPostId]) => {
       return posts.find((post) => post.id === selectedPostId);
     }),
@@ -218,6 +248,7 @@ export class DeclarativePostService {
   );
 
   selectPost(postId: string) {
+    console.log(postId, 'POSTID FROM SELECT POST METHOD');
     this.selectedPostSubject.next(postId);
   }
 

@@ -9,10 +9,11 @@ import {
   UntypedFormControl,
   UntypedFormGroup,
 } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
-import { combineLatest, map, tap } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
+import { combineLatest, map, startWith, tap } from 'rxjs';
 import { DeclarativeCategoryService } from 'src/app/services/declarative-category.service';
 import { DeclarativePostService } from 'src/app/services/declarative-post.service';
+import { NotificationService } from 'src/app/services/notification.service';
 
 @Component({
   selector: 'app-post-form',
@@ -32,6 +33,7 @@ export class PostFormComponent {
       const id = paramMap.get('id')!;
       id && (this.postId = id);
       this.postService.selectPost(id);
+      console.log(id);
       return id;
     })
   );
@@ -48,16 +50,54 @@ export class PostFormComponent {
   );
   categories$ = this.categoryService.categories$;
 
-  vm$ = combineLatest([this.selectedPostId$, this.post$]);
-
   // ngOnInit() {
   //   console.log(this.route);
   // }
 
+  // notification$ = this.notificationService.successMessageAction$.pipe(
+  //   startWith(''),
+  //   tap((message) => {
+  //     if (message) {
+  //       this.router.navigateByUrl('/declarativeposts');
+  //     }
+  //   })
+  // );
+  notification$ = this.postService.postCRUDCompleteAction$.pipe(
+    startWith(false),
+    tap((message) => {
+      if (message) {
+        this.router.navigateByUrl('/declarativeposts');
+      }
+    })
+  );
+  vm$ = combineLatest([
+    this.selectedPostId$.pipe(
+      tap((value) => {
+        console.log(value, 'selectedpost');
+      })
+    ),
+    this.post$.pipe(
+      tap((value) => {
+        console.log(value, 'post$');
+      })
+    ),
+    this.notification$.pipe(
+      tap((value) => {
+        console.log(value, 'notification');
+      })
+    ),
+  ]).pipe(
+    tap((value) => {
+      console.log('combine latest vm$', value);
+    })
+  );
+
   constructor(
     private categoryService: DeclarativeCategoryService,
     private route: ActivatedRoute, // private ref: ChangeDetectorRef
-    private postService: DeclarativePostService
+    private postService: DeclarativePostService,
+    private notificationService: NotificationService,
+    private router: Router
   ) {}
 
   onPostSubmit() {
