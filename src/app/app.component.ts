@@ -15,16 +15,21 @@ export class AppComponent {
 
   successMessage$ = this.notificationService.successMessageAction$.pipe(
     tap((message) => {
-      setTimeout(() => {
-        this.notificationService.clearAllMessages();
-      }, 3000);
+      if (message) {
+        setTimeout(() => {
+          this.notificationService.clearAllMessages();
+        }, 3000);
+      }
     })
   );
   errorMessage$ = this.notificationService.errorMessageAction$.pipe(
     tap((message) => {
-      setTimeout(() => {
-        this.notificationService.clearAllMessages();
-      }, 3000);
+      console.log(message);
+      if (message) {
+        setTimeout(() => {
+          this.notificationService.clearAllMessages();
+        }, 3000);
+      }
     })
   );
 

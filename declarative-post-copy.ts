@@ -68,8 +68,8 @@ export class DeclarativePostService {
         } as IPost;
       });
     }),
-    catchError(this.handleError)
-    // shareReplay(1)
+    catchError(this.handleError),
+    shareReplay(1)
   );
 
   private postCRUDSubject = new Subject<CRUDAction<IPost>>();
@@ -80,7 +80,7 @@ export class DeclarativePostService {
   );
 
   private postCRUDCompleteSubject = new Subject<boolean>();
-  postCRUDCompleteAction$ = this.postCRUDCompleteSubject.asObservable();
+  postCRUDCompleteAction$ = this.postCRUDSubject.asObservable();
 
   allPost$ = merge(
     this.postWithCategory$,
@@ -112,8 +112,8 @@ export class DeclarativePostService {
       // return [...posts, ...value];
       return this.modifyPosts(posts, value);
     }, [] as IPost[]),
-    catchError(this.handleError)
-    // shareReplay(1)
+    catchError(this.handleError),
+    shareReplay(1)
     // map(([value1, value2]) => {
     //   console.log('HEYYY', value1, value2);
     //   return [...value1, ...value2];
@@ -200,7 +200,7 @@ export class DeclarativePostService {
 
   updatePostToServer(post: IPost) {
     return this.http.patch<IPost>(
-      `https://angular-rxjsreactive-default-rtdb.asia-southeast1.firebasedatabase.app/posts/${post.id}.json`,
+      `https://angularr-rxjsreactive-default-rtdb.asia-southeast1.firebasedatabase.app/posts/${post.id}.json`,
       post
     );
   }
@@ -255,8 +255,8 @@ export class DeclarativePostService {
     catchError((err) => {
       console.log('peep from post$');
       return this.handleError(err);
-    })
-    // shareReplay(1)
+    }),
+    shareReplay(1)
   );
 
   selectPost(postId: string) {

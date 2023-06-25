@@ -10,7 +10,7 @@ import {
   UntypedFormGroup,
 } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { combineLatest, map, startWith, tap } from 'rxjs';
+import { EMPTY, catchError, combineLatest, map, startWith, tap } from 'rxjs';
 import { DeclarativeCategoryService } from 'src/app/services/declarative-category.service';
 import { DeclarativePostService } from 'src/app/services/declarative-post.service';
 import { NotificationService } from 'src/app/services/notification.service';
@@ -40,12 +40,18 @@ export class PostFormComponent {
 
   post$ = this.postService.post$.pipe(
     tap((post) => {
+      console.log(post, 'hehe');
       post &&
         this.postForm.setValue({
           title: post?.title,
           description: post?.description,
           categoryId: post?.categoryId,
         });
+    }),
+    catchError((error) => {
+      console.log(`error is ${error}`);
+      this.notificationService.setErrorMessage(error);
+      return EMPTY;
     })
   );
   categories$ = this.categoryService.categories$;
@@ -65,7 +71,9 @@ export class PostFormComponent {
   notification$ = this.postService.postCRUDCompleteAction$.pipe(
     startWith(false),
     tap((message) => {
+      console.log('tap tap activated', message);
       if (message) {
+        console.log(message, 'wooooo');
         this.router.navigateByUrl('/declarativeposts');
       }
     })
