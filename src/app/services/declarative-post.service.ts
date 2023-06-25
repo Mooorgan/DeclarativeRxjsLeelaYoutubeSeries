@@ -21,6 +21,7 @@ import {
 } from 'rxjs';
 import { CategoryService } from './category.service';
 import { DeclarativeCategoryService } from './declarative-category.service';
+import { NotificationService } from './notification.service';
 
 @Injectable({
   providedIn: 'root',
@@ -116,13 +117,28 @@ export class DeclarativePostService {
   savePosts(postAction: CRUDAction<IPost>) {
     let postDetails$!: Observable<IPost>;
     if (postAction.action === 'add') {
-      postDetails$ = this.addPostToServer(postAction.data);
+      postDetails$ = this.addPostToServer(postAction.data).pipe(
+        tap(() => {
+          this.notificationService.setSuccessMessage('Post added Successfully');
+        })
+      );
     }
     if (postAction.action === 'update') {
-      postDetails$ = this.updatePostToServer(postAction.data);
+      postDetails$ = this.updatePostToServer(postAction.data).pipe(
+        tap(() => {
+          this.notificationService.setSuccessMessage(
+            'Post updated Successfully'
+          );
+        })
+      );
     }
     if (postAction.action === 'delete') {
       return this.deletePostToServer(postAction.data).pipe(
+        tap(() => {
+          this.notificationService.setSuccessMessage(
+            'Post deleted Successfully'
+          );
+        }),
         map((_) => {
           return postAction.data;
         })
@@ -189,7 +205,8 @@ export class DeclarativePostService {
 
   constructor(
     private http: HttpClient,
-    private categoryService: DeclarativeCategoryService
+    private categoryService: DeclarativeCategoryService,
+    private notificationService: NotificationService
   ) {}
 
   post$ = combineLatest([this.allPost$, this.selectedPostAction$]).pipe(

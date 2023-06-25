@@ -1,5 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { LoaderService } from './services/loader.service';
+import { NotificationService } from './services/notification.service';
+import { tap } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -11,5 +13,23 @@ export class AppComponent {
   title = 'reactiveDeclarative';
   showLoader$ = this.loaderService.loadingAction$;
 
-  constructor(private loaderService: LoaderService) {}
+  successMessage$ = this.notificationService.successMessageAction$.pipe(
+    tap((message) => {
+      setTimeout(() => {
+        this.notificationService.clearAllMessages();
+      }, 3000);
+    })
+  );
+  errorMessage$ = this.notificationService.errorMessageAction$.pipe(
+    tap((message) => {
+      setTimeout(() => {
+        this.notificationService.clearAllMessages();
+      }, 3000);
+    })
+  );
+
+  constructor(
+    private loaderService: LoaderService,
+    private notificationService: NotificationService
+  ) {}
 }
