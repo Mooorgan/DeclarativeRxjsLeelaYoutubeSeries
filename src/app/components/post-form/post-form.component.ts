@@ -1,4 +1,8 @@
-import { ChangeDetectorRef, Component } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+} from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -14,8 +18,10 @@ import { DeclarativePostService } from 'src/app/services/declarative-post.servic
   selector: 'app-post-form',
   templateUrl: './post-form.component.html',
   styleUrls: ['./post-form.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PostFormComponent {
+  postId = '';
   postForm = new UntypedFormGroup({
     title: new UntypedFormControl(''),
     description: new UntypedFormControl(''),
@@ -24,6 +30,7 @@ export class PostFormComponent {
   selectedPostId$ = this.route.paramMap.pipe(
     map((paramMap) => {
       const id = paramMap.get('id')!;
+      id && (this.postId = id);
       this.postService.selectPost(id);
       return id;
     })
@@ -54,6 +61,15 @@ export class PostFormComponent {
   ) {}
 
   onPostSubmit() {
-    console.log(this.postForm.value);
+    // console.log(this.postForm.value);
+    let postDetails = this.postForm.value;
+    if (this.postId) {
+      // console.log('update post');
+      postDetails = { ...postDetails, id: this.postId };
+      this.postService.updatePost(postDetails);
+    } else {
+      // console.log('add post');
+      this.postService.addPost(postDetails);
+    }
   }
 }
