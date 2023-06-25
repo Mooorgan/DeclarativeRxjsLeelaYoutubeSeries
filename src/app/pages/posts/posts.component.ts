@@ -14,7 +14,7 @@ import { PostService } from 'src/app/services/post.service';
   selector: 'app-posts',
   templateUrl: './posts.component.html',
   styleUrls: ['./posts.component.scss'],
-  // changeDetection: ChangeDetectionStrategy.OnPush,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PostsComponent implements OnInit, OnDestroy {
   posts!: IPost[];
@@ -44,8 +44,10 @@ export class PostsComponent implements OnInit, OnDestroy {
     // });
     this.postSubscription = this.postService.getPostsWithCategory().subscribe({
       next: (data) => {
+        console.log(data);
         this.posts = data;
-        // this.ref.detectChanges();
+        console.log(this.posts);
+        this.ref.detectChanges();
       },
 
       error: (err) => {

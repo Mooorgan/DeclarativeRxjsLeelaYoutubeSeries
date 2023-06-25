@@ -14,8 +14,12 @@
           </option>
         </select>
       </div>
+      <div class="col-md-8 text-end">
+        <a class="btn btn-primary" routerLink="/declarativeposts/add"
+          >Add Post</a
+        >
+      </div>
     </div>
-
     <table class="table">
       <thead>
         <tr>
@@ -23,6 +27,7 @@
           <th>Title</th>
           <th>Description</th>
           <th>Category</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -33,6 +38,13 @@
           <td>{{ post.title }}</td>
           <td>{{ post.description }}</td>
           <td>{{ post.categoryName }}</td>
+          <td>
+            <a
+              class="btn btn-warning"
+              [routerLink]="['/declarativeposts/edit', post.id]"
+              >Update Post</a
+            >
+          </td>
         </tr>
       </tbody>
     </table>

@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { IPost } from '../models/IPost';
 import { CategoryService } from './category.service';
-import { map, merge, mergeMap } from 'rxjs';
+import { catchError, map, merge, mergeMap, shareReplay } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -14,9 +14,22 @@ export class PostService {
   ) {}
 
   getPosts() {
-    return this.http.get<IPost[]>(
-      `https://angular-rxjsreactive-default-rtdb.asia-southeast1.firebasedatabase.app/posts.json`
-    );
+    return this.http
+      .get<IPost[]>(
+        `https://angular-rxjsreactive-default-rtdb.asia-southeast1.firebasedatabase.app/posts.json`
+      )
+      .pipe(
+        map((posts) => {
+          let postsData: IPost[] = [];
+          for (let id in posts) {
+            postsData.push({ ...posts[id], id });
+          }
+          return postsData;
+        })
+        // delay(2000),
+        // shareReplay(1)
+        // share()
+      );
   }
 
   getPostsWithCategory() {
