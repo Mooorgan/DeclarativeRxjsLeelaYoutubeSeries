@@ -4,7 +4,7 @@
   "tasks": [
     {
       "type": "npm",
-      "script": "start",
+      "script": "start-debug",
       "isBackground": true,
       "problemMatcher": {
         "owner": "typescript",

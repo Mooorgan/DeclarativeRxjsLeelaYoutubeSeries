@@ -68,8 +68,8 @@ export class DeclarativePostService {
         } as IPost;
       });
     }),
+    shareReplay(1),
     catchError(this.handleError)
-    // shareReplay(1)
   );
 
   private postCRUDSubject = new Subject<CRUDAction<IPost>>();
@@ -105,15 +105,15 @@ export class DeclarativePostService {
     )
   ).pipe(
     tap((value) => {
-      console.log('allposts$ ran');
+      console.log('allposts$ Ran');
     }),
     // tap(console.log),
     scan((posts, value: IPost[] | CRUDAction<IPost>) => {
       // return [...posts, ...value];
       return this.modifyPosts(posts, value);
     }, [] as IPost[]),
+    shareReplay(1),
     catchError(this.handleError)
-    // shareReplay(1)
     // map(([value1, value2]) => {
     //   console.log('HEYYY', value1, value2);
     //   return [...value1, ...value2];
@@ -255,8 +255,8 @@ export class DeclarativePostService {
     catchError((err) => {
       console.log('peep from post$');
       return this.handleError(err);
-    })
-    // shareReplay(1)
+    }),
+    shareReplay(1)
   );
 
   selectPost(postId: string) {
